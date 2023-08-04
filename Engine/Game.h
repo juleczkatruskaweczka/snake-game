@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.h																				  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -20,20 +20,20 @@
  ******************************************************************************************/
 #pragma once
 
+#include <random>
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
 #include "Board.h"
 #include "Snake.h"
 #include "Goal.h"
-#include <random>
 
 class Game
 {
 public:
-	Game( class MainWindow& wnd );
-	Game( const Game& ) = delete;
-	Game& operator=( const Game& ) = delete;
+	Game(class MainWindow& wnd);
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 	void Go();
 private:
 	void ComposeFrame();
@@ -46,17 +46,15 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	/********************************/
 	Board brd;
-	Snake snek;
-	Location delta_loc = {1,0};
+	Snake snake;
+	Location delta_loc = { 1,0 };
 	std::mt19937 rng;
 	Goal goal;
-	static constexpr int snekMovePeriodMin = 4;
-	int snekMovePeriod = 20;
-	int snekMoveCounter = 0;
-	static constexpr int snekSpeedupPeriod = 180;
-	int snekSpeedupCounter = 0;
+	int snakeMovePeriod = 20;
+	int snakeMoveCounter = 0;
 	bool gameIsOver = false;
-	bool gameIsStarted = false;
-	/********************************/
+	int grubol = 0;
+	bool start = false;
 };

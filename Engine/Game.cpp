@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.cpp																			  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -20,22 +20,23 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "Keyboard.h"
 #include "SpriteCodex.h"
 
-Game::Game( MainWindow& wnd )
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd ),
-	brd( gfx ),
-	rng( std::random_device()() ),
-	snek( {2,2} ),
-	goal( rng,brd,snek )
+	wnd(wnd),
+	gfx(wnd),
+	brd(gfx),
+	rng(std::random_device()()),
+	snake({ 2,2 }),
+	goal(rng, brd, snake)
 {
 }
 
 void Game::Go()
 {
-	gfx.BeginFrame();	
+	gfx.BeginFrame();
 	UpdateModel();
 	ComposeFrame();
 	gfx.EndFrame();
@@ -43,79 +44,68 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if( gameIsStarted )
-	{
-		if( !gameIsOver )
-		{
-			if( wnd.kbd.KeyIsPressed( VK_UP ) )
-			{
-				delta_loc = { 0,-1 };
-			}
-			else if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
-			{
-				delta_loc = { 0,1 };
-			}
-			else if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
-			{
-				delta_loc = { -1,0 };
-			}
-			else if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
-			{
-				delta_loc = { 1,0 };
-			}
+	if (!gameIsOver) {
+		if (wnd.kbd.KeyIsPressed(VK_DOWN)) {
+			delta_loc = { 0,1 };
+		}
+		else if (wnd.kbd.KeyIsPressed(VK_UP)) {
+			delta_loc = { 0,-1 };
+		}
+		else if (wnd.kbd.KeyIsPressed(VK_LEFT)) {
+			delta_loc = { -1,0 };
+		}
+		else if (wnd.kbd.KeyIsPressed(VK_RIGHT)) {
+			delta_loc = { 1,0 };
+		}
 
-			++snekMoveCounter;
-			if( snekMoveCounter >= snekMovePeriod )
-			{
-				snekMoveCounter = 0;
-				const Location next = snek.GetNextHeadLocation( delta_loc );
-				if( !brd.IsInsideBoard( next ) ||
-					snek.IsInTileExceptEnd( next ) )
-				{
-					gameIsOver = true;
-				}
-				else
-				{
-					const bool eating = next == goal.GetLocation();
-					if( eating )
-					{
-						snek.Grow();
-					}
-					snek.MoveBy( delta_loc );
-					if( eating )
-					{
-						goal.Respawn( rng,brd,snek );
-					}
-				}
+
+		++snakeMoveCounter;
+		if (snakeMoveCounter >= snakeMovePeriod) {
+			snakeMoveCounter = 0;
+			Location next = snake.GetNextHeadLocation(delta_loc);
+			if (!brd.IsInsideBoard(next) || (snake.IsInTile(next))) {
+				gameIsOver = true;
 			}
-			++snekSpeedupCounter;
-			if( snekSpeedupCounter >= snekSpeedupPeriod )
-			{
-				snekSpeedupCounter = 0;
-				snekMovePeriod = std::max( snekMovePeriod - 1,snekMovePeriodMin );
+			else {
+				const bool eating = next == goal.GetLocation();
+				if (eating) {
+					snake.Grow();
+					grubol++;
+					if (grubol == 3) {
+						snakeMovePeriod -= 1;
+						grubol = 0;
+					}
+				}
+				snake.MoveBy(delta_loc);
+				if (eating) {
+					goal.Respawn(rng, brd, snake);
+				}
 			}
 		}
-	}
-	else
-	{
-		gameIsStarted = wnd.kbd.KeyIsPressed( VK_RETURN );
 	}
 }
-
 void Game::ComposeFrame()
 {
-	if( gameIsStarted )
-	{
-		snek.Draw( brd );
-		goal.Draw( brd );
-		if( gameIsOver )
-		{
-			SpriteCodex::DrawGameOver( 350,265,gfx );
+	if (!start) SpriteCodex::DrawTitle(300, 300, gfx);
+	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
+		start = true;
+	}
+	if (start) {
+		snake.Draw(brd);
+		goal.Draw(brd);
+		brd.DrawBoardBorder();
+		if (gameIsOver) {
+			SpriteCodex::DrawGameOver(200, 300, gfx);
 		}
-		brd.DrawBorder();
 	}
-	else
-	{
-		SpriteCodex::DrawTitle( 290,225,gfx );
-	}
+	/*std::uniform_int_distribution<int> colorDist(0, 255);
+
+	for (int y = 0; y < brd.GetGridHeight(); y++) {
+
+		for (int x = 0; x < brd.GetGridWidth(); x++) {
+			Location loc = { x,y };
+			Color c (colorDist(rng), colorDist(rng), colorDist(rng));
+			brd.DrawCell(loc, c);
+		}
+	}*/
 }
