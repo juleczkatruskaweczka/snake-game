@@ -1,26 +1,29 @@
 #pragma once
-
 #include "Graphics.h"
 #include "Location.h"
+#include <assert.h>
+#include "Graphics.h"
 
-class Board
-{
+class Board {
+
 public:
-	Board( Graphics& gfx );
-	void DrawCell( const Location& loc,Color c );
-	int GetGridWidth() const;
-	int GetGridHeight() const;
-	bool IsInsideBoard( const Location& loc ) const;
-	void DrawBorder();
+	Board(Graphics& gfx);
+	void DrawBoardBorder();
+	void DrawCell(const Location& loc, Color c);
+	void DrawCellBorder(const Location& loc, Color c);
+	void DrawCellPattern(const Location& loc, Color c);
+	int GetGridWidth();
+	int GetGridHeight();
+	bool IsInsideBoard(const Location& loc) const;
+	int GetDimension();
 private:
-	static constexpr Color borderColor = Colors::Blue;
 	static constexpr int dimension = 20;
-	static constexpr int cellPadding = 1;
-	static constexpr int width = 32;
-	static constexpr int height = 24;
-	static constexpr int borderWidth = 4;
-	static constexpr int borderPadding = 2;
-	static constexpr int x = 70;
-	static constexpr int y = 50;
+	static constexpr int width = 30;
+	static constexpr int height = 25;
+	static constexpr int xMin = 0;
+	static constexpr int yMin = 0;
+	static constexpr int xMax = width * dimension;
+	static constexpr int yMax = height * dimension;
+	Color borderColor = Colors::White;
 	Graphics& gfx;
 };
